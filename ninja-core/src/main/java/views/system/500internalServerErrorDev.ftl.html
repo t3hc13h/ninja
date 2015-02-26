@@ -2,9 +2,13 @@
     <head>
         <title>Internal Exception</title>
         <style type="text/css">
+            body {
+                color: #333333;
+                font-family: "Titillium Web", serif;
+                font-size: 16px;
+            }
 
             .error-code {
-                font-family: "Times New Roman", Times, serif;
                 margin-top: 5%;
                 width: 80%;
                 border: 3px solid black;
@@ -17,18 +21,120 @@
             }
 
             .error-code__text {
-                font-family: "Times New Roman", Times, serif;
                 text-align: left; 
                 font-size: 10pt;
                 padding: 1em;
             }
+
+            /*----- Tabs -----*/
+            .tabs {
+                width:100%;
+                display:inline-block;
+            }
+
+            /*----- Tab Links -----*/
+            /* Clearfix */
+            .tab-links:after {
+                display:block;
+                clear:both;
+                content:'';
+            }
+
+            .tab-links {
+                padding: 0;
+                margin: 0;
+            }
+
+            .tab-links li {
+                margin:0px 5px;
+                float:left;
+                list-style:none;
+                color: #404040;
+            }
+
+            .tab-links a {
+                padding:9px 15px;
+                display:inline-block;
+                border-radius:3px 3px 0px 0px;
+                font-size:16px;
+                color: #333;
+                text-decoration: none;
+                text-shadow: 0px 0px 0px;
+                transition:all linear 0.15s;
+            }
+
+            .tab-links a:hover {
+                background:#404040;
+                text-decoration:none;
+            }
+
+            li.active a {
+                background-color: #68006C;
+                color: #fff;
+                text-decoration: none;
+            }
+
+            /*            li.active a:hover {
+                            background:#fff;
+                            color:#4c4c4c;
+                        }*/
+
+            /*----- Content of Tabs -----*/
+            .tab-content {
+                padding:15px;
+                border-radius:3px;
+                box-shadow:-1px 1px 1px rgba(0,0,0,0.15);
+                background:#fff;
+            }
+
+            .tab {
+                display:none;
+            }
+
+            .tab.active {
+                display:block;
+            }
         </style>
     </head>
     <body>
-        <div class="error-code centered">
+        <div id="exception-info">
             <div class="error-code__text">
                 <h3>Welp, something didn't quite go according to plan.</h3>
                 <pre>${exceptionMessage.text}</pre>
+            </div>
+
+        </div>
+        <div id="request-info">
+            <p>Remote Address: ${context.getRemoteAddr()}</p>
+            <p>Method: ${context.getMethod()}</p>
+            <p>Request Path: ${context.getRequestPath()}</p>
+            <p>Controller: ${context.getRoute().getControllerClass()}</p>
+            <p>Action: ${context.getRoute().getControllerMethod()}</p>
+            <div>Headers:
+                <ul>
+                    <#assign headers=context.getHeaders()>
+                    <#list headers?keys as headerKey>
+                    <li>
+                        <span>${headerKey}: </span>
+                        <#list headers[headerKey] as value>
+                        ${value}
+                        </#list>
+                    </li>
+                    </#list>
+                </ul>
+            </div>
+            <div>Parameters:
+                <ul>
+                    <#assign parameters=context.getParameters()>
+                    <#list parameters?keys as paramKey>
+                    <li>
+                        <span>${paramKey}: </span>
+                        <#list parameters[paramKey] as value>
+                        ${value}
+                        </#list>
+                    </li>
+                    </#list>
+                </ul>
             </div>
         </div>
     </body>

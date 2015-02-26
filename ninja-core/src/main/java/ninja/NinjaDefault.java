@@ -174,7 +174,8 @@ public class NinjaDefault implements Ninja {
         if (ninjaProperties.isDev()) {
             Message exceptionMessage = new ExceptionMessage(exception);
             result.render(exceptionMessage)
-                    .template(NinjaConstant.LOCATION_VIEW_FTL_HTML_INTERNAL_SERVER_ERROR_DEV);
+                  .render("context", context)
+                  .template(NinjaConstant.LOCATION_VIEW_FTL_HTML_INTERNAL_SERVER_ERROR_DEV);
         } else {
             String messageI18n
                     = messages.getWithDefault(
