@@ -160,6 +160,7 @@ public class Routes implements ApplicationRoutes {
         }
 
         router.GET().route("/bad_request").with(ApplicationController.class, "badRequest");
+        router.GET().route("/internal_error").with(ApplicationController.class, "internalError");
 
         router.GET().route("/assets/webjars/{fileName: .*}").with(AssetsController.class, "serveWebJars");
         router.GET().route("/assets/{fileName: .*}").with(AssetsController.class, "serveStatic");

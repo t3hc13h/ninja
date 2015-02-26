@@ -23,6 +23,7 @@ import ninja.i18n.Messages;
 import ninja.lifecycle.LifecycleService;
 import ninja.utils.Message;
 import ninja.utils.NinjaConstant;
+import ninja.utils.NinjaProperties;
 import ninja.utils.ResultHandler;
 import static org.hamcrest.CoreMatchers.equalTo;
 import org.junit.Test;
@@ -59,14 +60,17 @@ public class NinjaDefaultTest {
     @Mock
     Result result;
     
+    @Mock
+    NinjaProperties ninjaProperties;
+
     Route route;
     
     @Captor
     ArgumentCaptor<Result> resultCaptor;
     
     NinjaDefault ninjaDefault;
-            
-            
+    
+    
     @Before
     public void before() {
         
@@ -75,6 +79,7 @@ public class NinjaDefaultTest {
         ninjaDefault.resultHandler = resultHandler;
         ninjaDefault.router = router;
         ninjaDefault.messages = messages;
+        ninjaDefault.ninjaProperties = ninjaProperties;
         
         // Just a dummy to make logging work without
         // Null pointer exceptions.
@@ -96,7 +101,8 @@ public class NinjaDefaultTest {
                         Matchers.anyString(), 
                         any(Optional.class)))
                 .thenReturn("NOT_IMPORTANT_MESSAGE");
-                
+        
+        Mockito.when(ninjaProperties.isDev()).thenReturn(false);
     }
     
     @Test
@@ -257,6 +263,19 @@ public class NinjaDefaultTest {
             Matchers.eq(contextImpl),
             any(Optional.class));
                 
+    }
+    
+    @Test
+    public void testThatGetInternalServerErrorResultReturnsDevTemplateWithExceptionMessage() throws Exception {
+        Mockito.when(ninjaProperties.isDev()).thenReturn(true);
+        // real test:
+        Result result = ninjaDefault.getInternalServerErrorResult(
+                contextImpl,
+                new Exception("not important"));
+        
+        assertThat(result.getStatusCode(), equalTo(Result.SC_500_INTERNAL_SERVER_ERROR));
+        assertThat(result.getTemplate(), equalTo(NinjaConstant.LOCATION_VIEW_FTL_HTML_INTERNAL_SERVER_ERROR_DEV));
+        assertTrue(result.getRenderable() instanceof Message);        
     }
     
     @Test

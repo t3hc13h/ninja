@@ -33,6 +33,10 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
 import com.google.inject.Inject;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import ninja.utils.ExceptionMessage;
+import ninja.utils.NinjaProperties;
 
 
 public class NinjaDefault implements Ninja {
@@ -61,6 +65,9 @@ public class NinjaDefault implements Ninja {
     
     @Inject
     Messages messages;
+    
+    @Inject
+    NinjaProperties ninjaProperties;
 
 
     @Override
@@ -152,30 +159,34 @@ public class NinjaDefault implements Ninja {
     
     @Override
     public Result getInternalServerErrorResult(Context context, Exception exception) {
-            
+
         logger.error(
                 "Emitting bad request 500. Something really wrong when calling route: {} (class: {} method: {})",
-                context.getRequestPath(), 
-                context.getRoute().getControllerClass(), 
-                context.getRoute().getControllerMethod(), 
+                context.getRequestPath(),
+                context.getRoute().getControllerClass(),
+                context.getRoute().getControllerMethod(),
                 exception);
-        
-        String messageI18n 
-                = messages.getWithDefault(
-                        NinjaConstant.I18N_NINJA_SYSTEM_INTERNAL_SERVER_ERROR_TEXT_KEY,
-                        NinjaConstant.I18N_NINJA_SYSTEM_INTERNAL_SERVER_ERROR_TEXT_DEFAULT,
-                        context,
-                        Optional.<Result>absent());
-        
-        Message message = new Message(messageI18n);
 
         Result result = Results
                 .internalServerError()
                 .supportedContentTypes(Result.TEXT_HTML, Result.APPLICATION_JSON, Result.APPLICATION_XML)
-                .fallbackContentType(Result.TEXT_HTML)
-                .render(message)
-                .template(NinjaConstant.LOCATION_VIEW_FTL_HTML_INTERNAL_SERVER_ERROR);
-        
+                .fallbackContentType(Result.TEXT_HTML);
+        if (ninjaProperties.isDev()) {
+            Message exceptionMessage = new ExceptionMessage(exception);
+            result.render(exceptionMessage)
+                    .template(NinjaConstant.LOCATION_VIEW_FTL_HTML_INTERNAL_SERVER_ERROR_DEV);
+        } else {
+            String messageI18n
+                    = messages.getWithDefault(
+                            NinjaConstant.I18N_NINJA_SYSTEM_INTERNAL_SERVER_ERROR_TEXT_KEY,
+                            NinjaConstant.I18N_NINJA_SYSTEM_INTERNAL_SERVER_ERROR_TEXT_DEFAULT,
+                            context,
+                            Optional.<Result>absent());
+
+            Message message = new Message(messageI18n);
+            result.render(message)
+                    .template(NinjaConstant.LOCATION_VIEW_FTL_HTML_INTERNAL_SERVER_ERROR);
+        }
 
         return result;
     }
@@ -312,6 +323,18 @@ public class NinjaDefault implements Ninja {
         // log Ninja splash screen
         logger.info(NINJA_LOGO, ninjaVersion);
         
+    }
+
+    private String formatException(Exception exception) {
+        StringWriter sw = new StringWriter();
+        sw.append("Unhandled Exception: ");
+        sw.append(exception.getMessage());
+        sw.append("\r\n\r\n");
+        try(PrintWriter ew = new PrintWriter(sw))
+        {
+            exception.printStackTrace(ew);
+        }
+        return sw.toString();
     }
 
 }

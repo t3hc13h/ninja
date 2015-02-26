@@ -48,6 +48,7 @@ import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import ninja.exceptions.NinjaException;
 
 @Singleton
 public class ApplicationController {
@@ -254,6 +255,11 @@ public class ApplicationController {
     
         throw new BadRequestException("Just a test to make sure 400 bad request works :)");
         
+    }
+    
+        @Timed
+    public Result internalError() {
+        throw new NinjaException(500, "Just a test to make sure 500 internal errror works :)");
     }
 
     @Timed    

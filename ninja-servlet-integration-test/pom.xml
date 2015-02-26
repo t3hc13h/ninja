@@ -43,25 +43,18 @@
                 <configuration>
                     <contextPath>/</contextPath>
                     <stopKey>stop</stopKey>
-                    <stopPort>8889</stopPort>					
+                    <stopPort>8889</stopPort>
                     <scanIntervalSeconds>1</scanIntervalSeconds>
                     <reload>automatic</reload>
-                    <classesDirectory>
-                        target/classes;../ninja-core/target/classes;../ninja-core-test/target/classes
-                    </classesDirectory>
-                    <scanTargets>
-                        <scanTarget>../ninja-core/target/classes</scanTarget>
-                        <scanTarget>../ninja-core-test/target/classes</scanTarget>
-                    </scanTargets>                   
                     <scanTargetPatterns>
-                        <scanTargetPattern>               
+                        <scanTargetPattern>
                             <directory>target/classes</directory>
                             <includes>
                                 <include>**/*</include>
                             </includes>
                             <excludes>
-                                <exclude>**/*.ftl.html</exclude> 
-                                <exclude>assets/**</exclude> 
+                                <exclude>**/*.ftl.html</exclude>
+                                <exclude>assets/**</exclude>
                             </excludes>
                         </scanTargetPattern>
                     </scanTargetPatterns>
